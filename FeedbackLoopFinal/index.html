@@ -1,0 +1,449 @@
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+		<title>Feedback Loop</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+		<!--[if lte IE 8]><script src="js/html5shiv.js"></script><![endif]-->
+
+
+		<link rel="stylesheet" href="css/font-awesome/css/font-awesome.min.css">
+		<link rel="stylesheet" href="css/style.css" />
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+
+	</head>
+	<body class="homepage" style="background: #fff;">
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		<script>
+		var linePosition = 0;
+			$(function () {
+				var socket = io();
+				$(".about-content").hide();
+				// socket.on('new user', function(){
+				//   $('#numConn').text("user disconnected"));
+				// });
+				$('.about').click(function(){
+					// $("#exampleModal").modal('show');
+					$(".main-letter").hide();
+					$(".about-content").show();
+				});
+
+				$('.write').click(function(){
+					// $("#exampleModal").modal('show');
+					$(".main-letter").show();
+					$(".about-content").hide();
+				});
+
+
+
+				$( "#sel1" ).change(function() {
+
+  				console.log( "Handler for .change() called." );
+					var str = "";
+					if(linePosition>2){
+					$("#exampleModal").modal('show');
+				}else{
+    			$( "#sel1 option:selected" ).each(function() {
+      			str += $( this ).text() + " ";
+						console.log("selection 1= ", str);
+						socket.emit($( this ).text());
+
+    			});
+						console.log(str);
+					}
+				});
+
+				$( "#sel2" ).change(function() {
+
+					console.log( "Handler for .change() called." );
+					var str = "";
+					if(linePosition>2){
+					$("#exampleModal").modal('show');
+				}else{
+					$( "#sel2 option:selected" ).each(function() {
+						str += $( this ).text() + " ";
+						console.log("selection 2= ", str);
+						socket.emit($( this ).text());
+
+					});
+						console.log(str);
+					}
+				});
+
+				$( "#sel3" ).change(function() {
+
+					console.log( "Handler for .change() called." );
+					var str = "";
+					if(linePosition>2){
+					$("#exampleModal").modal('show');
+				}else{
+					$( "#sel3 option:selected" ).each(function() {
+						str += $( this ).text() + " ";
+						console.log("selection 3= ", str);
+						socket.emit($( this ).text());
+
+					});
+						console.log(str);
+					}
+
+				});
+
+				$( "#sel4" ).change(function() {
+
+					console.log( "Handler for .change() called." );
+					var str = "";
+					if(linePosition>2){
+					$("#exampleModal").modal('show');
+				}else{
+					$( "#sel4 option:selected" ).each(function() {
+						str += $( this ).text() + " ";
+						console.log("selection 4= ", str);
+						socket.emit($( this ).text());
+
+					});
+						console.log(str);
+					}
+
+				});
+
+
+		 socket.on("user connected", function(viewCount, connectedUsers) {
+			 console.log(viewCount)
+			 linePosition = connectedUsers-1;
+				$("#viewcount").html(viewCount);
+				$("#connectedusers").html(connectedUsers);
+		 });
+		 socket.on("bumped", function(connectedUsers){
+			 linePosition --;
+			 $("#connectedusers").html(linePosition);
+			 if(linePosition>1){
+			 				$("#connectedusers").html(linePosition);}else{
+								setTimeout(function(){
+									socket.emit("bumpedu");
+									linePosition = connectedUsers+1;
+									$("#connectedusers").html(linePosition);
+									alert("Hello, you've been in position 1 for more than 5 minutes. To keep the experience fun for everyone waiting, we have moved you to the end of the line.")}, 300000);
+						 };
+
+
+		 });
+
+		 socket.on("new connection", function(connectedUsers){
+			$("#connectedusers").html(linePosition);
+			if(linePosition==1 && connectedUsers>1){
+							 setTimeout(function(){
+								 socket.emit("bumpedu");
+								 linePosition = connectedUsers+1;
+								 $("#connectedusers").html(linePosition);
+								 alert("Hello, you've been in position 1 for more than 5 minutes. To keep the experience fun for everyone waiting, we have moved you to the end of the line.")}, 300000);
+						};
+
+
+		});
+		 socket.on("disconnect", function(connectedUsers) {
+			 if(linePosition>1){
+			 linePosition --;
+		 }
+		 if(linePosition==1){
+		 setTimeout(function(){
+			 socket.emit("bumpedu");
+			 linePosition = connectedUsers+1;
+			 $("#connectedusers").html(linePosition);
+			 alert("Hello, you've been in position 1 for more than 5 minutes. To keep the experience fun for everyone waiting, we have moved you to the end of the line.");
+	}, 300000);
+	};
+			 console.log(linePosition);
+				$("#connectedusers").html(linePosition);
+		 });
+
+
+
+		  $(window).bind('beforeunload', function(){
+				 return 'Are you sure you want to leave? Closing this page causes you to lose your place in line.'; });
+
+
+
+
+			});
+			</script>
+
+
+
+
+	<div id="header-wrapper" style="margin: 0 14%;">
+
+		<!-- Header -->
+			<div id="header">
+				<div class="container">
+
+					<!-- Logo -->
+						<div id="logo">
+							<a href="#"><img src="/images/feedbackloop_logo.jpg" /></a>
+
+						</div>
+						<div id="slogan">an immersive digital and analog experience</div>
+
+					<!-- Nav -->
+						<nav id="nav">
+							<ul>
+								<li><a href="#" class="about">About</a></li>
+								<!-- <li><a href="/how-it-works.html">How it works</a></li> -->
+								<li id="navHighlight"><a href="#" class='write'>Write your letter</a></li>
+							</ul>
+						</nav>
+
+				</div>
+			</div>
+
+		<!-- Header -->
+
+		<!-- Banner -->
+			<div id="banner" class="main-letter">
+				<div class="container">
+
+					<section style="margin:30px 20%; padding: 0px 0 40px 0; text-align: justify">
+						<header>
+							<h2>Write your letter</h2>
+							<div id="introText">Feedback Loop is a project designed to connect you to yourself, whether that be in the past, present, or future. When you're first in line, select the options that resonate with you and submit the form and your letter will be showin in the stream on our board. You can also choose to email the letter to yourself now, or at a future date.</div>
+						</header>
+					</section>
+				</div>
+			</div>
+
+			<div id="banner" class="about-content">
+				<div class="container">
+
+					<section style="margin:30px 20%; padding: 0px 0 40px 0; text-align: justify">
+						<header>
+							<h2>About</h2>
+							<div id="introText"><p><strong>Feedback Loop</strong> is an immersive digital and analog experience deisgned to connect us with our past, present and future selves. Through this project we seek to engage participants in a visually stimulating, sensory experience that fosters mutual connection through technology and art.</p>
+
+							<p>This experience was originally intended to be experienced entirely in-person but due to COVID-19, our team has worked diligently to transform this into a combination of digital and analog. While we are sad that we cannot present this in person, and certainly for the many people fighting against COVID-19 as patients and medical staff, we hope you enjoy the experience still.</p>
+
+							<p>We are a collective of interdisciplinary artists, designers, creators, makers and techs. This project was created as an assignment for our Digital Studio course, in conjunction with the pursuit of our graduate degrees from the <a href="#" target="_blank">ATLAS Institute at the University of Colorado, Boulder</a>. Each of us is working to complete our Master's focusing on <a href="#" target="_blank">Creative Technology + Design</a>. Learn about each of us and our focus areas below.
+							</div>
+						</header>
+					</section>
+				</div>
+			</div>
+		<!-- /Banner -->
+
+
+
+		<!-- Modal -->
+		<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h3 class="modal-title" id="exampleModalLabel">We aren't ready for you yet!</h3>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		        <p>When you're first in line, you'll be able to control the piece. DON'T navigate away from the Feedback Loop website or you'll lose your spot.</p>
+						<p>If you want to read more about us while you wait, click the button below. You won't lose your spot!</p>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-secondary" data-dismiss="modal">Read About The Project</button>
+		        <button type="button" class="btn btn-primary">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+		<div class="row">
+			<div class="column counter">
+				<h2>View Count: </h2><H2 id="viewcount">stuff</h2>
+				</div>
+				<div class="column counter">
+				<h2>Line Position: </h><h2 id="connectedusers">other stuff</h2>
+			</div>
+
+		</div>
+
+	<!-- Main -->
+	<div class="main-letter">
+	<div class="row">
+	  <div class="column">
+					<div id="letter">
+						<h2>Choose your letter options</h2>
+						To my&nbsp;&nbsp;<div id="dropdown1" class="minimal">
+						<select id="sel1">
+							<option class="s" value="">-- select --</option>
+							<option class="s" value="younger">younger</option>
+							<option class="s" value="present">present</option>
+							<option class="s" value="future">future</option>
+						</select>
+						</div>&nbsp;&nbsp;self,
+						<p>I know that you are going through a hard time, but don't</p>
+						be discouraged. You are&nbsp;&nbsp;<div id="dropdown2" class="minimal">
+						  <select id="sel2">
+							<option value=""> -- select -- </option>
+							<option value="stronger">wiser</option>
+							<option value="smarter">smarter</option>
+							<option value="braver">braver</option>
+						  </select>
+						</div>
+						<p>than you think.</p>
+						<p>&nbsp;</p>
+						<p>Don't let setbacks get you down—think of</p>
+						<p>all the things you've overcome, and all the goals you've</p>
+						<p>achieved.</p>
+						<p>&nbsp;</p>
+						<p>Think of how you have</p>
+						been so&nbsp;&nbsp;<div id="dropdown3" class="minimal">
+						  <select id="sel3">
+							<option value=""> -- select -- </option>
+							<option value="dedicated">dedicated</option>
+							<option value="creative">creative</option>
+							<option value="loving">loving</option>
+						  </select>
+						</div>&nbsp;&nbsp;. Remeber,
+						<p>you have so many gifts.</p>
+						You are very&nbsp;&nbsp;<div id="dropdown4" class="minimal">
+						  <select id="sel4">
+							<option value=""> -- select -- </option>
+							<option value="admirable">confident</option>
+							<option value="compassionate">admirable</option>
+							<option value="industrious">industrious</option>
+						</select>
+					</div>&nbsp;.
+						<p>&nbsp;</p>
+						<p>Love,
+						<p>Yourself</p>
+						<p>&nbsp;</p>
+							<h2>Want to Email this letter?</h2>
+							<p class="email">Emailing this letter is optional. Your information will not be saved nor used for any other purpose than email the letter.</p>
+							<form action="#">
+								<div class="container">
+									<label class="label" for="email"><b>EMAIL</b></label><br />
+									<input type="text" class="emailBox" placeholder="example@gmail.com" name="email">
+
+									<input button type="submit" value="Submit Letter">
+
+
+								</div>
+							</form>
+
+
+					</div>
+	  </div>
+	  <div class="column">
+					<div id="letter">
+						<h2>Video Feed</h2>
+						<p>See our letter board change as others submit their letters!<br />
+						When you submit your letter, you will be added to the queue.</p>
+<iframe width="100%" height="315" src="https://www.youtube.com/embed/ntUuIsAcAe0?&autoplay=1&showinfo=0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+	  </div>
+	</div>
+
+
+
+
+			<div class="divider"></div>
+		</div>
+	</div>
+
+	<!-- /Main -->
+
+	<!-- Team -->
+	<div class="about-content">
+	<div class="container">
+	<h2 style="text-align: center;">Our Team</h2>
+
+
+	<div class="row">
+		<div class="aboutColumn">
+		<div class="aboutImg" id="one"><img src="images/amanda.jpeg" /></div>
+		<div class="name">Amanda Barrel</div>
+		<div class="title">Chief Making Officer</div>
+		<div class="aboutDivider" id="one"></div>
+
+		<p class="desc">Amanda Barrell received a Bachelor of Science degree in journalism as well as a certificate for Technology, Arts and Media (TAM) from the University of Colorado Boulder. Through coursework that led to the TAM certificate, her interest in creative technology was piqued. A Colorado native, Amanda spent considerable time working with community-based nonprofits and civic organizations before joining CU Boulder’s Division of Continuing Education. As a Creative Technologies and Design (CTD) student, her interest is focused on exploring the role of visual narrative through technology.</p>
+		<div class="social"><a href="#"><span class="fa fa-instagram" id="socialIcon"></span></a><a href="#"><span class="fa fa-twitter" id="socialIcon"></span></a> <a href="#"><span class="fa fa-linkedin" id="socialIcon"></span></a></div>
+
+		</div>
+		<div class="aboutColumn">
+		<div class="aboutImg" id="two"><img src="images/anna.jpg" /></div>
+		<div class="name">Anna E Cook</div>
+		<div class="title">Art and UX Director</div>
+		<div class="aboutDivider" id="two"></div>
+		<p class="desc">Anna E. Cook is a designer focused on user experience, user interface and interaction design. She attended CU Boulder from 2010 to 2014 for her Bachelor of Art degree, where she majored in studio art in digital media, with a minor in Technology, Arts & Media (TAM). Over the past seven years, she has been privileged to work and grow with a diverse range of clients from startups to large scale organizations. Anna has been offering workshops and sharing design expertise at events since 2013. She has educated children to adults, designers, developers, teachers and others. Anna is passionate about inclusion, accessibility and education and hopes to use the Creative Technologies and Design (CTD) program to further her ambition of creating inclusive experiences in complex technological landscapes.</p>
+		<div class="social"><a href="#"><span class="fa fa-instagram" id="socialIcon"></span></a><a href="#"><span class="fa fa-twitter" id="socialIcon"></span></a> <a href="#"><span class="fa fa-linkedin" id="socialIcon"></span></a></div>
+
+		</div>
+		<div class="aboutColumn">
+		<div class="aboutImg" id="three"><img src="images/casey.jpg" /></div>
+		<div class="name">Casey Hunt</div>
+		<div class="title">Chief Technical Officer</div>
+		<div class="aboutDivider" id="three"></div>
+		<p class="desc">Casey Hunt graduated from the University of Utah in 2015 with a Bachelor of Science in biological chemistry. In the years since, she has worked in organizational and systems design, leadership development, and data science. Casey is interested in applying a design-based approach to confront the socio-political crisis of social capital dissolution, with the hope of constructing environments and systems that reinforce nurturing and regenerative social networks. </p>
+		<div class="social"><a href="#"><span class="fa fa-instagram" id="socialIcon"></span></a><a href="#"><span class="fa fa-twitter" id="socialIcon"></span></a> <a href="#"><span class="fa fa-linkedin" id="socialIcon"></span></a></div>
+
+		</div>
+		<div class="aboutColumn">
+		<div class="aboutImg" id="four"><img src="images/john.jpg" /></div>
+		<div class="name">John Williams</div>
+		<div class="title">Chief Sherpa</div>
+		<div class="aboutDivider" id="four"></div>
+		<p class="desc">John Williams is a creator. With a background in science journalism, marketing, and web design and development, he shares the excitement of science and space as a content specialist and web developer with education and public outreach at the National Solar Observatory. As an award-winning science writer and web designer, he loves learning new things and creating engaging experiences. When he's not trying to drum up a new way to explain sun science, he is a taekwondo instructor, an avid backpacker, writer, photographer (especially the Milky Way and macro shots), digital artist, WordPress plugin developer, Alexa skills creator and space speaker as a NASA/JPL solar system ambassador.  He also climbs Colorado’s 14ers for fun.</p>
+		<div class="social"><a href="#"><span class="fa fa-instagram" id="socialIcon"></span></a><a href="#"><span class="fa fa-twitter" id="socialIcon"></span></a> <a href="#"><span class="fa fa-linkedin" id="socialIcon"></span></a></div>
+
+		</div>
+
+	</div>
+	</div>
+
+
+
+
+			<div class="divider"></div>
+		</div>
+	</div>
+
+	<!-- /Team -->
+
+	<!-- Footer -->
+		<div id="footer">
+			<div class="container">
+				<div class="row">
+					<div class="footerBlurb">
+						<p>Thank you for visiting our experience!</p>
+					</div>
+					<section>
+						<!-- Nav -->
+						<nav id="footerNav">
+							<ul class="default">
+								<li><a href="#" class="about">About</a></li>
+								<!-- <li><a href="#">How it works</a></li> -->
+								<li><a href="#" class="write">Write your letter</a></li>
+								<li><a href="https://www.instagram.com/feedbackloopexp/"><span class="fa fa-instagram"></span></a></li>
+							</ul>
+						</nav>
+					</section>
+				</div>
+			</div>
+		</div>
+	<!-- /Footer -->
+
+	<!-- Copyright -->
+		<div id="copyright">
+			<div class="container">
+				©2020 <a href="#">Feedback Loop</a>
+			</div>
+		</div>
+
+
+	</body>
+</html>
